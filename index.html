@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sum calc</title>
+  <style>
+    body {
+      background-color: #000309;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 100px;
+    }
+
+    h2 {
+      font-size: 24px;
+      color:white;
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 10px;
+      width: 200px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #eb2525;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #af1e1e;
+    }
+
+    .result {
+      margin-top: 30px;
+      font-size: 18px;
+      color:white;
+      font-weight: bold;
+    }
+
+    .words {
+      margin-top: 10px;
+      font-style: italic;
+      color: #f6f3f3;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Sum Calculator</h2>
+  <input type="number" id="inputNumber" placeholder="Enter a number" />
+  <br>
+  <button ondblclick="calculateSum()">Generate</button>
+
+  <p class="result" id="resultOutput"></p>
+  <p class="words" id="wordOutput"></p>
+
+  <script>
+    function numberToWords(n) {
+      const a = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+        "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen",
+        "seventeen", "eighteen", "nineteen"];
+      const b = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+
+      if (n === 0) return "zero";
+      if (n < 20) return a[n];
+      if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? "-" + a[n % 10] : "");
+      if (n < 1000) return a[Math.floor(n / 100)] + " hundred" + (n % 100 ? " and " + numberToWords(n % 100) : "");
+      if (n < 1000000) return numberToWords(Math.floor(n / 1000)) + " thousand" + (n % 1000 ? " " + numberToWords(n % 1000) : "");
+      return "Number too large";
+    }
+
+    function calculateSum() {
+      const input = document.getElementById('inputNumber').value;
+      const n = parseInt(input);
+
+      if (isNaN(n) || n < 0) {
+        document.getElementById('resultOutput').innerText = "Please enter a valid non-negative number.";
+        document.getElementById('wordOutput').innerText = "";
+        return;
+      }
+
+      let sum = 0;
+      for (let i = 0; i <= n; i++) {
+        sum += i;
+      }
+
+      document.getElementById('resultOutput').innerText = "Sum is: " + sum;
+      document.getElementById('wordOutput').innerText = "In Words: " + numberToWords(sum);
+    }
+  </script>
+
+</body>
+</html>
