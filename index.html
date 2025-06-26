@@ -1,56 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Sum calc</title>
+  <meta charset="UTF-8" />
+  <title>Sum Calculator</title>
   <style>
     body {
       background-color: #000309;
       font-family: Arial, sans-serif;
       text-align: center;
-      padding-top: 100px;
+      padding-top: 80px;
     }
 
     h2 {
       font-size: 24px;
-      color:white;
       margin-bottom: 20px;
     }
 
     input {
       padding: 10px;
       width: 200px;
+      font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 5px;
-      font-size: 16px;
     }
 
     button {
-      margin-top: 10px;
       padding: 10px 20px;
+      margin-top: 10px;
       background-color: #eb2525;
       color: white;
       border: none;
       border-radius: 5px;
-      font-size: 16px;
       cursor: pointer;
+      font-size: 16px;
     }
 
     button:hover {
       background-color: #af1e1e;
     }
 
-    .result {
+    .output, .history {
       margin-top: 30px;
       font-size: 18px;
-      color:white;
-      font-weight: bold;
+      color : white;
     }
 
     .words {
       margin-top: 10px;
       font-style: italic;
-      color: #f6f3f3;
+      color: #ffffff;
     }
   </style>
 </head>
@@ -59,10 +57,15 @@
   <h2>Sum Calculator</h2>
   <input type="number" id="inputNumber" placeholder="Enter a number" />
   <br>
-  <button ondblclick="calculateSum()">Generate</button>
+  <button onclick="calculateSum()">Calculate</button>
 
-  <p class="result" id="resultOutput"></p>
-  <p class="words" id="wordOutput"></p>
+  <div class="output">
+    <div id="resultOutput"></div>
+    <div class="words" id="wordOutput"></div>
+  </div>
+
+  <div class="history" id="historyOutput"></div>
+  
 
   <script>
     function numberToWords(n) {
@@ -80,12 +83,12 @@
     }
 
     function calculateSum() {
-      const input = document.getElementById('inputNumber').value;
+      const input = document.getElementById("inputNumber").value;
       const n = parseInt(input);
 
       if (isNaN(n) || n < 0) {
-        document.getElementById('resultOutput').innerText = "Please enter a valid non-negative number.";
-        document.getElementById('wordOutput').innerText = "";
+        document.getElementById("resultOutput").innerText = "Please enter a valid non-negative number.";
+        document.getElementById("wordOutput").innerText = "";
         return;
       }
 
@@ -94,10 +97,40 @@
         sum += i;
       }
 
-      document.getElementById('resultOutput').innerText = "Sum is: " + sum;
-      document.getElementById('wordOutput').innerText = "In Words: " + numberToWords(sum);
+      const sumWords = numberToWords(sum);
+      document.getElementById("resultOutput").innerText = "Sum is: " + sum;
+      document.getElementById("wordOutput").innerText = "In Words: " + sumWords;
+
+      // Send to backend
+      fetch("http://localhost:3001/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          input_number: n,
+          result_sum: sum,
+          result_words: sumWords
+        })
+      }).then(() => {
+        fetchLastFive(); // Refresh history
+      });
+    }
+
+    function fetchLastFive() {
+      fetch("http://localhost:3001/latest")
+        .then(res => res.json())
+        .then(data => {
+          let html = "<h3>Last 5 Calculations</h3><ul style='list-style: none; padding: 0;'>";
+          data.forEach(item => {
+            html += `<li>${item.input_number} → ${item.result_sum} (${item.result_words})</li>`;
+          });
+          html += "</ul>";
+          document.getElementById("historyOutput").innerHTML = html;
+        });
     }
   </script>
 
 </body>
 </html>
+
